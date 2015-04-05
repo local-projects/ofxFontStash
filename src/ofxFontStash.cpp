@@ -52,6 +52,7 @@ ofxFontStash::ofxFontStash(){
 	lineHeight = 1.0f;
 	stash = NULL;
 	batchDrawing = false;
+	drawCentered = false;
 }
 
 ofxFontStash::~ofxFontStash(){
@@ -146,6 +147,7 @@ ofRectangle ofxFontStash::drawMultiLineColumn( string & text, float size, float 
 		//ofLine(0, 0, maxW, 0);
 
 		vector<string>splitLines;
+		vector<int>lineWidths;
 		ofRectangle r;
 
 		//ofUTF8Ptr start = ofUTF8::beginPtr(text);
@@ -177,16 +179,19 @@ ofRectangle ofxFontStash::drawMultiLineColumn( string & text, float size, float 
 						thisLine = thisLine.substr(0, thisLine.length()-1);
 					}
 					splitLines.push_back(thisLine);
+					lineWidths.push_back(r.width);
 					
 				}else{
 					if (foundSpace){
 						//cout << "## foundSpace! (" << thisLine << ")" << endl;
 						string finalLine = walkAndFill(lineStart, iter, lastSpace);
 						splitLines.push_back(finalLine);
+						lineWidths.push_back(r.width);
 						iter = lastSpace;
 					}else{
 						//cout << "## no Space! (" << thisLine << ")" << endl;
 						splitLines.push_back(thisLine);
+						lineWidths.push_back(r.width);
 						if(wordsWereTruncated){
 							*wordsWereTruncated = true;
 						}
@@ -201,6 +206,7 @@ ofRectangle ofxFontStash::drawMultiLineColumn( string & text, float size, float 
 				if(iter == stop){ //last line!
 					string finalLine = walkAndFill(lineStart, iter, stop);
 					splitLines.push_back(finalLine);
+					lineWidths.push_back(r.width);
 					break;
 				}
 			}
@@ -216,19 +222,27 @@ ofRectangle ofxFontStash::drawMultiLineColumn( string & text, float size, float 
 			linesToDraw = splitLines.size();
 		}
 
+		// calculate final area so we can center text
 		for(int i = 0; i < linesToDraw; i++){
 			float yy = lineHeight * OFX_FONT_STASH_LINE_HEIGHT_MULT * size * i;
-			if(!dontDraw){
-				ofPushMatrix();
-				ofTranslate(0, yy);
-				drawBatch(splitLines[i], size, 0, 0 );
-				ofPopMatrix();
-			}
 			#if OF_VERSION_MAJOR == 0 && OF_VERSION_MINOR >= 8
 			totalArea = totalArea.getUnion( getBBox(splitLines[i], size, x, y + yy));
 			#else
 			totalArea = getBBox(splitLines[i], size, x, y + yy); //TODO!
 			#endif
+		}
+
+		for(int i = 0; i < linesToDraw; i++){
+			float yy = lineHeight * OFX_FONT_STASH_LINE_HEIGHT_MULT * size * i;
+			if(!dontDraw){
+				ofPushMatrix();
+				if (drawCentered){
+					ofTranslate((totalArea.width - lineWidths[i]) / 2.0f, 0);
+				}
+				ofTranslate(0, yy);
+				drawBatch(splitLines[i], size, 0, 0 );
+				ofPopMatrix();
+			}
 		}
 		if(!dontDraw){
 			endBatch();
@@ -403,6 +417,10 @@ ofRectangle ofxFontStash::getBBox( string text, float size, float xx, float yy )
 
 void ofxFontStash::setLineHeight(float percent){
 	lineHeight = percent;
+}
+
+void ofxFontStash::setCenteredText(bool centered){
+	drawCentered = centered;
 }
 
 //--------------------------------------------------------------

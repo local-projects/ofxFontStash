@@ -92,6 +92,7 @@ class ofxFontStash{
 		void endBatch();
 
 		void setLineHeight(float percent);
+		void setCenteredText(bool centered); // centered text only in drawMultiLineColumn()
 
 		void setKerning(bool enabled); //use ttf supplied kerning info at draw time or not
 		bool getKerning();
@@ -127,6 +128,7 @@ class ofxFontStash{
 		struct sth_stash*	stash;
 		int					stashFontID;
 		bool				batchDrawing;
+		bool				drawCentered;
 
 		//fill in a string
 		string walkAndFill(ofUTF8Ptr being, ofUTF8Ptr & iter, ofUTF8Ptr end);
