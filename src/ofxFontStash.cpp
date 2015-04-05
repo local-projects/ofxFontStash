@@ -186,7 +186,7 @@ ofRectangle ofxFontStash::drawMultiLineColumn( string & text, float size, float 
 						//cout << "## foundSpace! (" << thisLine << ")" << endl;
 						string finalLine = walkAndFill(lineStart, iter, lastSpace);
 						splitLines.push_back(finalLine);
-						lineWidths.push_back(r.width);
+						lineWidths.push_back(getBBox(finalLine, size, 0, 0).width);
 						iter = lastSpace;
 					}else{
 						//cout << "## no Space! (" << thisLine << ")" << endl;
@@ -206,7 +206,7 @@ ofRectangle ofxFontStash::drawMultiLineColumn( string & text, float size, float 
 				if(iter == stop){ //last line!
 					string finalLine = walkAndFill(lineStart, iter, stop);
 					splitLines.push_back(finalLine);
-					lineWidths.push_back(r.width);
+					lineWidths.push_back(getBBox(finalLine, size, 0, 0).width);
 					break;
 				}
 			}
