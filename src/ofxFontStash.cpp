@@ -145,7 +145,7 @@ float ofxFontStash::draw( const string& _text, float size, float x, float y){
 }
 
 
-ofRectangle ofxFontStash::drawMultiLine( const string& _text, float size, float x, float y, ofAlignHorz align, float width){
+ofRectangle ofxFontStash::drawMultiLine( const string& _text, float size, float x, float y, ofAlignHorz align, float width, bool dontDraw){
 
 	ofRectangle area;
 	
@@ -207,7 +207,9 @@ ofRectangle ofxFontStash::drawMultiLine( const string& _text, float size, float 
 						case OF_ALIGN_HORZ_CENTER: x = (maxW - widths[i]) * 0.5; break;
 					}
 					if(minDiffX > x) minDiffX = x;
-					ofx_sth_draw_text(stash,
+                    
+                    if (!dontDraw)
+                        ofx_sth_draw_text(stash,
 								  	fontIds[0],
 								  	size,
 									x * dpiScale,

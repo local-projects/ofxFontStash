@@ -73,7 +73,7 @@ class ofxFontStash{
 
 		//text with "\n" will produce line breaks
 		//width only makes sense for align = OF_ALIGN_HORZ_CENTER - as it will center the text block to the rect defined by [x + width] 
-		ofRectangle drawMultiLine( const std::string& text, float fontSize, float x, float y, ofAlignHorz align = OF_ALIGN_HORZ_LEFT, float width = 0);
+		ofRectangle drawMultiLine( const std::string& text, float fontSize, float x, float y, ofAlignHorz align = OF_ALIGN_HORZ_LEFT, float width = 0, bool dontDraw = false);
 
 		//fits text in a column of a certain width
 		//if you only want to find out the bbox size, send in dontDraw=true
