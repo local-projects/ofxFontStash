@@ -436,7 +436,12 @@ ofVec2f ofxFontStash::drawMultiColumnFormatted(const string &_text, float size, 
 
 			// handle '#' code to change color
 			if (isColorCode(words[j])) {
-				currentColor = ofColor::fromHex(ofHexToInt(words[j].substr(1, words[j].length())));
+                if (words[j].length() == 11) {
+                    int color = ofHexToInt(words[j].substr(1, words[j].length() - 2));
+                    int alpha = ofHexToInt(words[j].substr(words[j].length() - 2, words[j].length()));
+                    currentColor = ofColor::fromHex(color, alpha);
+                }
+                else currentColor = ofColor::fromHex(ofHexToInt(words[j].substr(1, words[j].length())));
 				continue;
 			}
 

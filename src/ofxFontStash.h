@@ -177,7 +177,7 @@ class ofxFontStash{
 		std::string walkAndFill(const char * begin, const char *& iter, const char * end);
 
 		bool isFontCode(const std::string& str) { return str.length()==2 && str[0] == '@'; }
-		bool isColorCode(const std::string& str) { return str.length()==9 && str[0] == '#'; }
+		bool isColorCode(const std::string& str) { return (str.length()==9 || str.length()==11) && str[0] == '#'; }
 		bool isScaleCode(const std::string& str) { return str[0] == '%'; }
     
         // ofTrueTypeFont parity attributes
