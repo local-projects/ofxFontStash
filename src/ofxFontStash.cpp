@@ -233,7 +233,11 @@ ofRectangle ofxFontStash::drawMultiLine( const string& _text, float size, float 
 ofRectangle ofxFontStash::drawMultiLineColumn( string & _text, float size, float x, float y,
 											  float maxW, int &numLines, bool dontDraw, int maxLines,
 											  bool giveBackNewLinedText, bool* wordsWereTruncated,
-											  bool centered){
+                                              bool centered, bool highlight,
+                                              ofColor fontColor,
+                                              ofColor highlightColor,
+                                              float highlightHeight,
+                                              float highlightOffset){
 
 	string text = _text;
 	if (!utf8::is_valid(text.begin(), text.end())){
@@ -290,12 +294,15 @@ ofRectangle ofxFontStash::drawMultiLineColumn( string & _text, float size, float
 						thisLine = thisLine.substr(0, thisLine.length()-1);
 					}
 					splitLines.push_back(thisLine);
+                    if(!centered) lineWidths.push_back(getBBox(thisLine, size, 0, 0).width);
+                    
 					if(centered) lineWidths.push_back(r.width);
 					
 				}else{
 					if (foundSpace){
 						string finalLine = walkAndFill(lineStart, iter, lastSpace);
 						splitLines.push_back(finalLine);
+                        if(!centered) lineWidths.push_back(getBBox(finalLine, size, 0, 0).width);
 						if(centered) lineWidths.push_back(getBBox(finalLine, size, 0, 0).width);
 						// Edge case where if max width is met and first character is space
 						if(!(utf8::unchecked::next(lineStart) == 0x20)){
@@ -303,6 +310,7 @@ ofRectangle ofxFontStash::drawMultiLineColumn( string & _text, float size, float
 						}
 					}else{
 						splitLines.push_back(thisLine);
+                        lineWidths.push_back(getBBox(thisLine, size, 0, 0).width);
 						if(centered) lineWidths.push_back(r.width);
 						if(wordsWereTruncated){
 							*wordsWereTruncated = true;
@@ -318,6 +326,7 @@ ofRectangle ofxFontStash::drawMultiLineColumn( string & _text, float size, float
 				if(iter == stop){ //last line!
 					string finalLine = walkAndFill(lineStart, iter, stop);
 					splitLines.push_back(finalLine);
+                    if(!centered) lineWidths.push_back(getBBox(finalLine, size, 0, 0).width);
 					if(centered) lineWidths.push_back(getBBox(finalLine, size, 0, 0).width);
 					break;
 				}
@@ -356,7 +365,17 @@ ofRectangle ofxFontStash::drawMultiLineColumn( string & _text, float size, float
 					xOff += offset;
 				}
 				ofTranslate(xOff, yy);
+                
+                if(highlight)
+                {
+                    ofSetColor(highlightColor);
+                    ofDrawRectangle(0, -highlightOffset, lineWidths[i], highlightOffset);
+                    ofSetColor(255);
+                }
+                
+                if(highlight) ofSetColor(fontColor);
 				drawBatch(splitLines[i], size, 0, 0 );
+                
 				ofPopMatrix();
 			}
 		}

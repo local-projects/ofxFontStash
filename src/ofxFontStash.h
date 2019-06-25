@@ -88,8 +88,12 @@ class ofxFontStash{
 										int maxLines = 0,
 										bool giveBackNewLinedText = false,
 										bool * wordsWereTruncated = NULL,
-										bool centered = false
-										);
+										bool centered = false,
+										bool highlight = false,
+                                        ofColor fontColor = ofColor::white,
+                                        ofColor highlightColor =  ofColor::yellow,
+                                        float highlightHeight = 20.0f,
+                                        float highlightOffset = 0.0f);
 
 /**
 		drawMultiColumnFormatted() how to use:
