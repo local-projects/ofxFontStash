@@ -95,6 +95,8 @@ class ofxFontStash{
                                         float highlightHeight = 20.0f,
                                         float highlightOffset = 0.0f);
 
+		void drawUnderlineForColumn(const ofRectangle& bbox, const std::string& text, float strokeWeight, float offsetY);
+
 /**
 		drawMultiColumnFormatted() how to use:
 		add one of the following as a single word to change text font and color.

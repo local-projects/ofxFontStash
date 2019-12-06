@@ -408,6 +408,19 @@ ofRectangle ofxFontStash::drawMultiLineColumn( string & _text, float size, float
 	return totalArea;
 }
 
+// assumes string has already been broken up by a drawMultiColumn call with a returned bbox
+// also needs size etc. to already be set
+void ofxFontStash::drawUnderlineForColumn(const ofRectangle& bbox, const std::string& text, float strokeWeight, float offsetY)
+{
+	std::string delim = "\n";
+	auto split = ofSplitString(text, delim, true, true);
+	for (int i = 0; i < static_cast<int>(split.size()); i++) {
+		float yy = fontSize + (lineHeight * OFX_FONT_STASH_LINE_HEIGHT_MULT * fontSize * i);
+		ofDrawRectangle(bbox.x, bbox.y + yy + offsetY, stringWidth(split[i]), strokeWeight);
+	}
+}
+
+
 
 ofVec2f ofxFontStash::drawMultiColumnFormatted(const string &_text, float size, float columnWidth, bool topLeftAlign, bool dryrun){
 
