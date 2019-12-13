@@ -6,21 +6,21 @@
 //  Copyright (c) 2012 uri.cat. All rights reserved.
 //
 /*
- 
+
  The MIT License
- 
+
  Copyright (c) 2012, Oriol Ferrer Mesià.
- 
+
  Permission is hereby granted, free of charge, to any person obtaining a copy
  of this software and associated documentation files (the "Software"), to deal
  in the Software without restriction, including without limitation the rights
  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  copies of the Software, and to permit persons to whom the Software is
  furnished to do so, subject to the following conditions:
- 
+
  The above copyright notice and this permission notice shall be included in
  all copies or substantial portions of the Software.
- 
+
  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -37,14 +37,14 @@
 using namespace std;
 
 std::string searchAndReplace(std::string &s,
-							 std::string toReplace,
-							 std::string replaceWith);
+	std::string toReplace,
+	std::string replaceWith);
 
 std::string searchAndReplace(std::string &s,
-                      std::string toReplace,
-                      std::string replaceWith)
+	std::string toReplace,
+	std::string replaceWith)
 {
-    return(s.replace(s.find(toReplace), toReplace.length(), replaceWith));
+	return(s.replace(s.find(toReplace), toReplace.length(), replaceWith));
 }
 
 
@@ -54,48 +54,47 @@ string toUTF8(const unsigned int& input) {
 	string txt;
 	try {
 		utf8::append(input, back_inserter(txt));
-	}
-	catch (const utf8::exception& utfcpp_ex) {
+	} catch (const utf8::exception& utfcpp_ex) {
 		string err = utfcpp_ex.what();
 		ofLog(OF_LOG_ERROR, "ofUTF8::append : " + err);
 	}
 	return txt;
 }
 
-string LocaleToUtf8(const string & locale){
+string LocaleToUtf8(const string & locale) {
 	return locale;
 }
 
 /* *********************************************************************** */
 
-ofxFontStash::ofxFontStash(){
-//	stashFontID = 0;
+ofxFontStash::ofxFontStash() {
+	//	stashFontID = 0;
 	lineHeight = 1.0f;
 	stash = NULL;
 	batchDrawing = false;
 }
 
-ofxFontStash::~ofxFontStash(){
-	if(stash != NULL) ofx_sth_delete(stash);
+ofxFontStash::~ofxFontStash() {
+	if (stash != NULL) ofx_sth_delete(stash);
 }
 
-bool ofxFontStash::setup(string firstFontFile, float lineHeightPercent , int _texDimension /*has to be powerfOfTwo!*/,
-						 bool createMipMaps, int intraCharPadding, float dpiScale_){
+bool ofxFontStash::setup(string firstFontFile, float lineHeightPercent, int _texDimension /*has to be powerfOfTwo!*/,
+	bool createMipMaps, int intraCharPadding, float dpiScale_) {
 
-	if (stash == NULL){
+	if (stash == NULL) {
 		dpiScale = dpiScale_;
 		extraPadding = intraCharPadding;
 		lineHeight = lineHeightPercent;
 		texDimension = ofNextPow2(_texDimension);
-		stash = ofx_sth_create(texDimension,texDimension, createMipMaps, intraCharPadding, dpiScale);
+		stash = ofx_sth_create(texDimension, texDimension, createMipMaps, intraCharPadding, dpiScale);
 		if (stash == NULL) {
 			ofLogError("ofxFontStash") << "Could not create stash for font '" << firstFontFile << "'";
-		}else {
+		} else {
 			stash->doKerning = 0; //kerning disabled by default
 			stash->charSpacing = 0.0; //spacing neutral by default
 			return addFont(firstFontFile);
 		}
-	}else{
+	} else {
 		ofLogError("ofxFontStash") << "Don't call setup() more than once!";
 	}
 
@@ -118,42 +117,42 @@ bool ofxFontStash::addFont(const std::string &fontFile)
 
 	fontIds.push_back(fontId);
 
-	ofLogNotice("ofxFontStash") << "Loaded font '" << fontFile << "' in texture ("<< texDimension << " x " << texDimension << ")";
+	ofLogNotice("ofxFontStash") << "Loaded font '" << fontFile << "' in texture (" << texDimension << " x " << texDimension << ")";
 	return true;
 }
 
 
-float ofxFontStash::draw( const string& _text, float size, float x, float y){
+float ofxFontStash::draw(const string& _text, float size, float x, float y) {
 
 	string text = _text;
 	float dx = 0;
-	if (!utf8::is_valid(text.begin(), text.end())){
+	if (!utf8::is_valid(text.begin(), text.end())) {
 		text = LocaleToUtf8(text);
 	}
 
-	if (stash != NULL){
-		
+	if (stash != NULL) {
+
 		glPushMatrix();
 		glTranslatef(x, y, 0.0);
 		ofx_sth_begin_draw(stash);
-		ofx_sth_draw_text( stash, fontIds[0], size, 0, 0 , text.c_str(), &dx ); //this might draw
+		ofx_sth_draw_text(stash, fontIds[0], size, 0, 0, text.c_str(), &dx); //this might draw
 		ofx_sth_end_draw(stash); // this actually draws
 		glPopMatrix();
-	}else{
+	} else {
 		ofLogError("ofxFontStash") << "Can't draw() without having been setup first!";
 	}
 	return dx;
 }
 
 
-ofRectangle ofxFontStash::drawMultiLine( const string& _text, float size, float x, float y, ofAlignHorz align, float width){
+ofRectangle ofxFontStash::drawMultiLine(const string& _text, float size, float x, float y, ofAlignHorz align, float width) {
 
 	ofRectangle area;
-	
-	if (stash != NULL){
+
+	if (stash != NULL) {
 
 		string text = _text;
-		if (!utf8::is_valid(text.begin(), text.end())){
+		if (!utf8::is_valid(text.begin(), text.end())) {
 			text = LocaleToUtf8(text);
 		}
 
@@ -164,13 +163,13 @@ ofRectangle ofxFontStash::drawMultiLine( const string& _text, float size, float 
 		vector<float> widths;
 		vector<float> ys;
 		float maxW = width;
-		
-		while ( getline(ss, s, '\n') ) {
+
+		while (getline(ss, s, '\n')) {
 			lines.push_back(s);
 			float yy = size * lineHeight * OFX_FONT_STASH_LINE_HEIGHT_MULT * line * dpiScale;
 			ys.push_back(yy);
-			ofRectangle dim = getBBox(s, size, x, y + yy / dpiScale );
-			
+			ofRectangle dim = getBBox(s, size, x, y + yy / dpiScale);
+
 			//debug
 //			ofPushMatrix();
 //				ofColor c; c.setHsb((44 * line)%255, 255, 255);
@@ -180,80 +179,90 @@ ofRectangle ofxFontStash::drawMultiLine( const string& _text, float size, float 
 //				ofSetColor(255);
 //			ofPopMatrix();
 
-			if(line == 0){
+			if (line == 0) {
 				area = dim;
-			}else{
+			} else {
 				area = area.getUnion(dim);
 			}
 			widths.push_back(dim.width);
-			if(width == 0){
-				if(maxW < dim.width) maxW = dim.width;
+			if (width == 0) {
+				if (maxW < dim.width) maxW = dim.width;
 			}
 			line++;
 		}
 
 		glPushMatrix();
-			glTranslatef(x, y, 0.0f);
-			ofx_sth_begin_draw(stash);
-			{
-			
-				float yy = size * lineHeight * OFX_FONT_STASH_LINE_HEIGHT_MULT * line * dpiScale;
-				float minDiffX = FLT_MAX;
-				for(int i = 0; i < lines.size(); i++){
-					float dx = 0;
-					float x = 0;
-					switch (align) {
-						case OF_ALIGN_HORZ_LEFT: break;
-						case OF_ALIGN_HORZ_RIGHT: x = maxW - widths[i]; break;
-						case OF_ALIGN_HORZ_CENTER: x = (maxW - widths[i]) * 0.5; break;
-						default: break;
-					}
-					if(minDiffX > x) minDiffX = x;
-					ofx_sth_draw_text(stash,
-								  	fontIds[0],
-								  	size,
-									x * dpiScale,
-								  	ys[i],
-								  	lines[i].c_str(),
-								  	&dx
-								  	);
+		glTranslatef(x, y, 0.0f);
+		ofx_sth_begin_draw(stash);
+		{
+
+			float yy = size * lineHeight * OFX_FONT_STASH_LINE_HEIGHT_MULT * line * dpiScale;
+			float minDiffX = FLT_MAX;
+			for (int i = 0; i < lines.size(); i++) {
+				float dx = 0;
+				float x = 0;
+				switch (align) {
+					case OF_ALIGN_HORZ_LEFT: break;
+					case OF_ALIGN_HORZ_RIGHT: x = maxW - widths[i]; break;
+					case OF_ALIGN_HORZ_CENTER: x = (maxW - widths[i]) * 0.5; break;
+					default: break;
 				}
-				area.x += minDiffX;
+				if (minDiffX > x) minDiffX = x;
+				ofx_sth_draw_text(stash,
+					fontIds[0],
+					size,
+					x * dpiScale,
+					ys[i],
+					lines[i].c_str(),
+					&dx
+				);
 			}
-			ofx_sth_end_draw(stash);
+			area.x += minDiffX;
+		}
+		ofx_sth_end_draw(stash);
 		glPopMatrix();
 
-	}else{
+	} else {
 		ofLogError("ofxFontStash") << "can't draw() without having been setup first!";
 	}
 	return area;
 }
 
 
-ofRectangle ofxFontStash::drawMultiLineColumn( string & _text, float size, float x, float y,
-											  float maxW, int &numLines, bool dontDraw, int maxLines,
-											  bool giveBackNewLinedText, bool* wordsWereTruncated,
-                                              bool centered, bool highlight,
-                                              ofColor fontColor,
-                                              ofColor highlightColor,
-                                              float highlightHeight,
-                                              float highlightOffset){
+ofRectangle ofxFontStash::drawMultiLineColumn(
+	string & _text, 
+	float size, 
+	float x, 
+	float y,
+	float maxW, 
+	int &numLines, 
+	bool dontDraw, 
+	int maxLines,
+	bool giveBackNewLinedText, 
+	bool* wordsWereTruncated,
+	bool centered, 
+	bool highlight,
+	ofColor fontColor,
+	ofColor highlightColor,
+	float highlightOffset,
+	float highlightHeight
+) {
 
 	string text = _text;
-	if (!utf8::is_valid(text.begin(), text.end())){
+	if (!utf8::is_valid(text.begin(), text.end())) {
 		text = LocaleToUtf8(text);
 	}
 
-	ofRectangle totalArea = ofRectangle(x,y,0,0);
+	ofRectangle totalArea = ofRectangle(x, y, 0, 0);
 
-	if(wordsWereTruncated){
+	if (wordsWereTruncated) {
 		*wordsWereTruncated = false;
 	}
 
-	if (stash != NULL){
+	if (stash != NULL) {
 
 		numLines = 0;
-		if(!dontDraw){
+		if (!dontDraw) {
 			glPushMatrix();
 			glTranslatef(x, y, 0.0f);
 		}
@@ -268,51 +277,51 @@ ofRectangle ofxFontStash::drawMultiLineColumn( string & _text, float size, float
 		const char * lastSpace;
 		const char * stop = text.c_str() + text.length();
 
-        string thisLine = "";
+		string thisLine = "";
 		bool foundSpace = false;
 		bool foundNewLine = false;
-		
-        while(iter < stop) {
+
+		while (iter < stop) {
 
 			unsigned int c = utf8::unchecked::next(iter); // get the next unichar and iterate
-			if ( isSpace(c) ){
+			if (isSpace(c)) {
 				foundSpace = true;
 				lastSpace = iter;
 			}
-			if ( toUTF8(c) == "\n" ){
+			if (toUTF8(c) == "\n") {
 				foundNewLine = true;
 			}
 
 			thisLine += toUTF8(c);
 
-			r = getBBox(thisLine.c_str(), size, 0,0);
-			if ( r.width > maxW || foundNewLine ) { //we went too far, lets jump back to our closest space
-				if(foundNewLine){
-					if (thisLine == "\n"){ //if the whole line is only \n, replace with a space to avoid weird things
+			r = getBBox(thisLine.c_str(), size, 0, 0);
+			if (r.width > maxW || foundNewLine) { //we went too far, lets jump back to our closest space
+				if (foundNewLine) {
+					if (thisLine == "\n") { //if the whole line is only \n, replace with a space to avoid weird things
 						thisLine = " ";
-					}else{	//otherwise remove the "\n"
-						thisLine = thisLine.substr(0, thisLine.length()-1);
+					} else {	//otherwise remove the "\n"
+						thisLine = thisLine.substr(0, thisLine.length() - 1);
 					}
 					splitLines.push_back(thisLine);
-                    if(!centered) lineWidths.push_back(getBBox(thisLine, size, 0, 0).width);
-                    
-					if(centered) lineWidths.push_back(r.width);
-					
-				}else{
-					if (foundSpace){
+					if (!centered) lineWidths.push_back(getBBox(thisLine, size, 0, 0).width);
+
+					if (centered) lineWidths.push_back(r.width);
+
+				} else {
+					if (foundSpace) {
 						string finalLine = walkAndFill(lineStart, iter, lastSpace);
 						splitLines.push_back(finalLine);
-                        if(!centered) lineWidths.push_back(getBBox(finalLine, size, 0, 0).width);
-						if(centered) lineWidths.push_back(getBBox(finalLine, size, 0, 0).width);
+						if (!centered) lineWidths.push_back(getBBox(finalLine, size, 0, 0).width);
+						if (centered) lineWidths.push_back(getBBox(finalLine, size, 0, 0).width);
 						// Edge case where if max width is met and first character is space
-						if(!(utf8::unchecked::next(lineStart) == 0x20)){
+						if (!(utf8::unchecked::next(lineStart) == 0x20)) {
 							iter = lastSpace;
 						}
-					}else{
+					} else {
 						splitLines.push_back(thisLine);
-                        lineWidths.push_back(getBBox(thisLine, size, 0, 0).width);
-						if(centered) lineWidths.push_back(r.width);
-						if(wordsWereTruncated){
+						lineWidths.push_back(getBBox(thisLine, size, 0, 0).width);
+						if (centered) lineWidths.push_back(r.width);
+						if (wordsWereTruncated) {
 							*wordsWereTruncated = true;
 						}
 					}
@@ -322,87 +331,87 @@ ofRectangle ofxFontStash::drawMultiLineColumn( string & _text, float size, float
 				r.width = 0;
 				thisLine = "";
 				foundSpace = foundNewLine = false;
-			}else{
-				if(iter == stop){ //last line!
+			} else {
+				if (iter == stop) { //last line!
 					string finalLine = walkAndFill(lineStart, iter, stop);
 					splitLines.push_back(finalLine);
-                    if(!centered) lineWidths.push_back(getBBox(finalLine, size, 0, 0).width);
-					if(centered) lineWidths.push_back(getBBox(finalLine, size, 0, 0).width);
+					if (!centered) lineWidths.push_back(getBBox(finalLine, size, 0, 0).width);
+					if (centered) lineWidths.push_back(getBBox(finalLine, size, 0, 0).width);
 					break;
 				}
 			}
-        }
+		}
 
-		if(!dontDraw) beginBatch();
+		if (!dontDraw) beginBatch();
 		numLines = splitLines.size();
 		int linesToDraw = 0;
-		if (maxLines > 0 ){
+		if (maxLines > 0) {
 			linesToDraw = MIN(splitLines.size(), maxLines);
 			numLines = splitLines.size();
-		}else{
+		} else {
 			linesToDraw = splitLines.size();
 		}
 
 
-		for(int i = 0; i < linesToDraw; i++){
+		for (int i = 0; i < linesToDraw; i++) {
 			float yy = lineHeight * OFX_FONT_STASH_LINE_HEIGHT_MULT * size * i;
-			#if OF_VERSION_MAJOR == 0 && OF_VERSION_MINOR >= 8
-			totalArea = totalArea.getUnion( getBBox(splitLines[i], size, x, y + yy));
-			#else
+#if OF_VERSION_MAJOR == 0 && OF_VERSION_MINOR >= 8
+			totalArea = totalArea.getUnion(getBBox(splitLines[i], size, x, y + yy));
+#else
 			totalArea = getBBox(splitLines[i], size, x, y + yy); //TODO!
-			#endif
+#endif
 		}
 
 		float smallestOffset = FLT_MAX; //bc of centering, we might shift lines to the right
-		for(int i = 0; i < linesToDraw; i++){
+		for (int i = 0; i < linesToDraw; i++) {
 			float yy = lineHeight * OFX_FONT_STASH_LINE_HEIGHT_MULT * size * i;
-			if(!dontDraw){
+			if (!dontDraw) {
 				ofPushMatrix();
 				float xOff = 0;
-				if (centered){
+				if (centered) {
 					float offset = (maxW - lineWidths[i]) / 2.0f;
-					if(offset < smallestOffset) smallestOffset = offset;
+					if (offset < smallestOffset) smallestOffset = offset;
 					xOff += offset;
 				}
 				ofTranslate(xOff, yy);
-                
-                if(highlight)
-                {
-                    ofSetColor(highlightColor);
-                    ofDrawRectangle(0, -highlightOffset, lineWidths[i], highlightOffset);
-                    ofSetColor(255);
-                }
-                
-                if(highlight) ofSetColor(fontColor);
-				drawBatch(splitLines[i], size, 0, 0 );
-                
+
+				if (highlight)
+				{
+					ofSetColor(highlightColor);
+					ofDrawRectangle(0, highlightOffset, lineWidths[i], highlightHeight);
+					ofSetColor(255);
+				}
+
+				if (highlight) ofSetColor(fontColor);
+				drawBatch(splitLines[i], size, 0, 0);
+
 				ofPopMatrix();
 			}
 		}
-		if(centered){
+		if (centered) {
 			totalArea.x += smallestOffset;
 		}
-		
-		if(!dontDraw){
+
+		if (!dontDraw) {
 			endBatch();
 			glPopMatrix();
 		}
 
 		//return through reference the edited text (with newLines!)
-		if(giveBackNewLinedText){
+		if (giveBackNewLinedText) {
 			text = "";
-			for (int i = 0; i < numLines; i++){
-				if (i < maxLines || maxLines == 0){
+			for (int i = 0; i < numLines; i++) {
+				if (i < maxLines || maxLines == 0) {
 					text += splitLines[i];
-					if (i != numLines-1) text += "\n";
+					if (i != numLines - 1) text += "\n";
 				}
 			}
 
-            //Return edited txt
-            _text = text;
+			//Return edited txt
+			_text = text;
 		}
 
-	}else{
+	} else {
 		ofLogError("ofxFontStash") << "can't draw() without having been setup first!";
 	}
 	return totalArea;
@@ -422,18 +431,18 @@ void ofxFontStash::drawUnderlineForColumn(const ofRectangle& bbox, const std::st
 
 
 
-ofVec2f ofxFontStash::drawMultiColumnFormatted(const string &_text, float size, float columnWidth, bool topLeftAlign, bool dryrun){
+ofVec2f ofxFontStash::drawMultiColumnFormatted(const string &_text, float size, float columnWidth, bool topLeftAlign, bool dryrun) {
 
-	float maxX=0;
+	float maxX = 0;
 
 	string text = _text;
-	if (!utf8::is_valid(text.begin(), text.end())){
+	if (!utf8::is_valid(text.begin(), text.end())) {
 		text = LocaleToUtf8(text);
 	}
 
 	if (stash == NULL || fontIds.empty()) {
 		ofLogError("ofxFontStash") << "error: stash not initialized or no font";
-		return ofVec2f(0,0);
+		return ofVec2f(0, 0);
 	}
 
 	//TODO hack!
@@ -454,11 +463,11 @@ ofVec2f ofxFontStash::drawMultiColumnFormatted(const string &_text, float size, 
 	// first, calculate the sizes of all the words
 	//
 	vector<std::string> lines = ofSplitString(localText, "\n");
-	for (int i=0; i<lines.size(); i++) {
+	for (int i = 0; i < lines.size(); i++) {
 
 		vector<std::string> words = ofSplitString(lines[i], " ");
 
-		for (int j=0; j<words.size(); j++) {
+		for (int j = 0; j < words.size(); j++) {
 
 			// handle '@' code to change font id
 			if (isFontCode(words[j])) {
@@ -481,12 +490,12 @@ ofVec2f ofxFontStash::drawMultiColumnFormatted(const string &_text, float size, 
 			std::string word = words[j];
 
 			// add ' ' because we removed it when we did the split
-			if (j != words.size()-1) {
+			if (j != words.size() - 1) {
 				word += " ";
 			}
 
 			float x, y, w, h;
-			ofx_sth_dim_text( stash, currentFontId, size * currentScale, word.c_str(), &x, &y, &w, &h);
+			ofx_sth_dim_text(stash, currentFontId, size * currentScale, word.c_str(), &x, &y, &w, &h);
 
 			allWords.push_back(word);
 			wordSizes.push_back(ofVec2f(w, h));
@@ -522,7 +531,7 @@ ofVec2f ofxFontStash::drawMultiColumnFormatted(const string &_text, float size, 
 		ofx_sth_begin_draw(stash);
 	}
 
-	for (int i=0; i<allWords.size(); i++) {
+	for (int i = 0; i < allWords.size(); i++) {
 
 		// do we need to jump a line?
 		if ((drawPointer.x + wordSizes[i].x > columnWidth ||
@@ -546,7 +555,7 @@ ofVec2f ofxFontStash::drawMultiColumnFormatted(const string &_text, float size, 
 
 		float dx = 0;
 		if (!dryrun) {
-			ofx_sth_draw_text( stash, wordFonts[i], size * wordScales[i], drawPointer.x, drawPointer.y, allWords[i].c_str(), &dx );
+			ofx_sth_draw_text(stash, wordFonts[i], size * wordScales[i], drawPointer.x, drawPointer.y, allWords[i].c_str(), &dx);
 		}
 		drawPointer.x += wordSizes[i].x;
 
@@ -580,69 +589,69 @@ float ofxFontStash::getFontHeight(float fontSize)
 
 
 
-void ofxFontStash::beginBatch(){
-	if(stash != NULL){
+void ofxFontStash::beginBatch() {
+	if (stash != NULL) {
 		batchDrawing = true;
 		ofx_sth_begin_draw(stash);
 	}
 }
 
-void ofxFontStash::endBatch(){
-	if(stash != NULL){
+void ofxFontStash::endBatch() {
+	if (stash != NULL) {
 		batchDrawing = false;
 		ofx_sth_end_draw(stash);
 	}
 }
 
-void ofxFontStash::setLodBias(float bias){
-	if(stash != NULL){
+void ofxFontStash::setLodBias(float bias) {
+	if (stash != NULL) {
 		set_lod_bias(stash, bias);
 	}
 }
 
-void ofxFontStash::drawBatch( const string& text, float size, float x, float y){
-	if (stash != NULL){
-		if(batchDrawing){
+void ofxFontStash::drawBatch(const string& text, float size, float x, float y) {
+	if (stash != NULL) {
+		if (batchDrawing) {
 			float dx = 0;
 			ofPushMatrix();
 			ofx_sth_begin_draw(stash);
 			ofTranslate(x, y);
-			ofx_sth_draw_text( stash, fontIds[0], size, 0, 0, text.c_str(), &dx ); //this might draw
+			ofx_sth_draw_text(stash, fontIds[0], size, 0, 0, text.c_str(), &dx); //this might draw
 			ofx_sth_end_draw(stash); // this actually draws
 			ofPopMatrix();
-		}else{
-			ofLogError("ofxFontStash") <<"Can't drawBatch() without calling beginBatch() first!";
+		} else {
+			ofLogError("ofxFontStash") << "Can't drawBatch() without calling beginBatch() first!";
 		}
-	}else{
+	} else {
 		ofLogError("ofxFontStash") << "Can't drawBatch() without having been setup first!";
 	}
 }
 
 
-void ofxFontStash::drawMultiLineBatch( const string& text, float size, float x, float y ){
-	if (stash != NULL){
-		if(batchDrawing){
+void ofxFontStash::drawMultiLineBatch(const string& text, float size, float x, float y) {
+	if (stash != NULL) {
+		if (batchDrawing) {
 			float dx = 0;
 			stringstream ss(text);
 			string s;
 			int line = 0;
-			while ( getline(ss, s, '\n') ) {
+			while (getline(ss, s, '\n')) {
 				//cout << s << endl;
 				float dx = 0;
-				ofx_sth_draw_text( stash, fontIds[0], size, 0.0f, size * lineHeight * OFX_FONT_STASH_LINE_HEIGHT_MULT * line, s.c_str(), &dx );
-				line ++;
+				ofx_sth_draw_text(stash, fontIds[0], size, 0.0f, size * lineHeight * OFX_FONT_STASH_LINE_HEIGHT_MULT * line, s.c_str(), &dx);
+				line++;
 			}
-		}else{
+		} else {
 			ofLogError("ofxFontStash") << "Can't drawBatch() without calling beginBatch() first!";
 		}
-	}else{
+	} else {
 		ofLogError("ofxFontStash") << "Can't drawBatch() without having been setup first!";
 	}
 }
 
 
 //string ofxFontStash::walkAndFill(ofUTF8Ptr begin, ofUTF8Ptr & iter, ofUTF8Ptr end){
-string ofxFontStash::walkAndFill(const char * begin, const char *& iter, const char * end){
+string ofxFontStash::walkAndFill(const char * begin, const char *& iter, const char * end) {
 
 	string finalLine = "";
 	const char * i = begin;
@@ -653,76 +662,76 @@ string ofxFontStash::walkAndFill(const char * begin, const char *& iter, const c
 			continue;
 
 		finalLine += toUTF8(c); // get the next unichar and iterate
-		if(i == end){
+		if (i == end) {
 			break;
 		}
 	}
 	return finalLine;
 }
 
-bool ofxFontStash::isSpace(unsigned int c){
+bool ofxFontStash::isSpace(unsigned int c) {
 	//http://www.fileformat.info/info/unicode/category/Zs/list.htm
 	return 	c == 0x20 || c == 0xA0 || c == 0x1680 || c == 0x2000 || c == 0x2001
-	|| c == 0x2002
-	|| c == 0x2003 || c == 0x2004 || c == 0x2005 || c == 0x2006 || c == 0x2007 || c == 0x2028
-	|| c == 0x2029
-	|| c == 0x2008 || c == 0x2009 || c == 0x200A || c == 0x202F || c == 0x205F || c == 0x3000
-//	//https://en.wikipedia.org/wiki/Whitespace_character
-//	|| c == 0x0009 //tab
-//	|| c == 0x000A //line feed
-//	|| c == 0x000B //line tab
-//	|| c == 0x000C //form feed
-//	|| c == 0x000F //carriage return
-//	|| c == 0x0085 //next line
-	;
+		|| c == 0x2002
+		|| c == 0x2003 || c == 0x2004 || c == 0x2005 || c == 0x2006 || c == 0x2007 || c == 0x2028
+		|| c == 0x2029
+		|| c == 0x2008 || c == 0x2009 || c == 0x200A || c == 0x202F || c == 0x205F || c == 0x3000
+		//	//https://en.wikipedia.org/wiki/Whitespace_character
+		//	|| c == 0x0009 //tab
+		//	|| c == 0x000A //line feed
+		//	|| c == 0x000B //line tab
+		//	|| c == 0x000C //form feed
+		//	|| c == 0x000F //carriage return
+		//	|| c == 0x0085 //next line
+		;
 }
 
-bool ofxFontStash::isPunctuation(unsigned int c){
+bool ofxFontStash::isPunctuation(unsigned int c) {
 	//http://www.fileformat.info/info/unicode/category/Zs/list.htm
 	return 	c == 0xFF0C || c == 0xFF0C;
 }
 
-void ofxFontStash::setKerning(bool enabled){
-	if (stash){
+void ofxFontStash::setKerning(bool enabled) {
+	if (stash) {
 		stash->doKerning = enabled ? 1 : 0;
-	}else{
+	} else {
 		ofLogError("ofxFontStash") << "Can't setKerning() without having been setup() first!";
 	}
 }
 
 
-bool ofxFontStash::getKerning(){
-	if (stash){
+bool ofxFontStash::getKerning() {
+	if (stash) {
 		return stash->doKerning != 0;
-	}else{
+	} else {
 		ofLogError("ofxFontStash") << "Can't getKerning() without having been setup() first!";
 	}
 	return false;
 }
 
 
-ofRectangle ofxFontStash::getBBox( const string& text, float size, float xx, float yy, ofAlignHorz align, float width){
+ofRectangle ofxFontStash::getBBox(const string& text, float size, float xx, float yy, ofAlignHorz align, float width) {
 
 	ofRectangle totalArea;
 
-	if (stash != NULL){
+	if (stash != NULL) {
 		stringstream ss(text);
 		string s;
 		int line = 0;
 		float totalH = 0;
 		vector<ofRectangle> rects;
-		while ( getline(ss, s, '\n') ) {
-			
+		while (getline(ss, s, '\n')) {
+
 			float dx = 0;
 			float w, h, x, y;
-			ofx_sth_dim_text( stash, fontIds[0], size / dpiScale, s.c_str(), &x, &y, &w, &h);
-			
+			ofx_sth_dim_text(stash, fontIds[0], size / dpiScale, s.c_str(), &x, &y, &w, &h);
+
 			totalArea.x = x + xx;
-			totalArea.y = yy + y ;
-			w = fabs (w - x);
-			h = fabs (y - h);
-			if(w > totalArea.width) totalArea.width = w;
-			if(h > totalArea.height) totalArea.height = h;
+			totalArea.y = yy + y;
+			w = fabs(w - x);
+			h = fabs(y - h);
+			if (w > totalArea.width) totalArea.width = w;
+			if (h > totalArea.height) totalArea.height = h;
 			ofRectangle r2 = totalArea;
 			r2.y -= r2.height;
 			r2.y += ((size * lineHeight)) * OFX_FONT_STASH_LINE_HEIGHT_MULT * line;
@@ -734,90 +743,90 @@ ofRectangle ofxFontStash::getBBox( const string& text, float size, float xx, flo
 //			ofRect(r2);
 //			ofSetColor(255);
 
-			line ++;
+			line++;
 		}
 
-		if(line > 1){ //if multiline
+		if (line > 1) { //if multiline
 			totalArea.y -= rects[0].height;
-			for(int i = 0; i < rects.size(); i++){
-				#if OF_VERSION_MAJOR == 0 && OF_VERSION_MINOR >= 8
+			for (int i = 0; i < rects.size(); i++) {
+#if OF_VERSION_MAJOR == 0 && OF_VERSION_MINOR >= 8
 				totalArea = totalArea.getUnion(rects[i]);	//TODO
-				#endif
+#endif
 			}
-		}else{
+		} else {
 			totalArea.y -= totalArea.height;
 		}
 
-	}else{
+	} else {
 		ofLogError("ofxFontStash") << "Can't getBoundingBoxSize() without having been setup first!";
 	}
 
-	if(extraPadding > 0){
+	if (extraPadding > 0) {
 		totalArea.width -= extraPadding;
 		totalArea.height -= extraPadding;
 	}
 
-	if(align != OF_ALIGN_HORZ_LEFT){
-		if(align == OF_ALIGN_HORZ_RIGHT){
+	if (align != OF_ALIGN_HORZ_LEFT) {
+		if (align == OF_ALIGN_HORZ_RIGHT) {
 			totalArea.x += width - totalArea.width;
-		}else{
+		} else {
 			totalArea.x += (width - totalArea.width) * 0.5;
 		}
 	}
-	
+
 	return totalArea;
 }
 
 
-void ofxFontStash::setLineHeight(float percent){
+void ofxFontStash::setLineHeight(float percent) {
 	lineHeight = percent;
 }
 
 //--------------------------------------------------------------
 // ofTrueTypeFont parity methods
-bool ofxFontStash::loadFont(string filename, int fsize, float lineHeightPercent, int textureDimension){
-    fontSize = fsize;
-	bool ret = setup(filename,lineHeightPercent, textureDimension);
+bool ofxFontStash::loadFont(string filename, int fsize, float lineHeightPercent, int textureDimension) {
+	fontSize = fsize;
+	bool ret = setup(filename, lineHeightPercent, textureDimension);
 	if (!ret) {
 		return false;
 	}
 	return ret;
 }
 
-bool ofxFontStash::isLoaded(){
-    return (stash != NULL);
+bool ofxFontStash::isLoaded() {
+	return (stash != NULL);
 }
 
-void ofxFontStash::setSize(int fsize){
-    fontSize = fsize;
+void ofxFontStash::setSize(int fsize) {
+	fontSize = fsize;
 }
 
-int ofxFontStash::getSize(){
-    return fontSize;
+int ofxFontStash::getSize() {
+	return fontSize;
 }
 
-float ofxFontStash::getLineHeight(){
-    return lineHeight;
+float ofxFontStash::getLineHeight() {
+	return lineHeight;
 }
 
-float ofxFontStash::getSpaceSize(){
-    return stringWidth(" ");
+float ofxFontStash::getSpaceSize() {
+	return stringWidth(" ");
 }
 
-float ofxFontStash::stringWidth(const string& s){
-    ofRectangle rect = getStringBoundingBox(s, 0,0);
-    return rect.width;
+float ofxFontStash::stringWidth(const string& s) {
+	ofRectangle rect = getStringBoundingBox(s, 0, 0);
+	return rect.width;
 }
 
-float ofxFontStash::stringHeight(const string& s){
-    ofRectangle rect = getStringBoundingBox(s, 0,0);
-    return rect.height;
+float ofxFontStash::stringHeight(const string& s) {
+	ofRectangle rect = getStringBoundingBox(s, 0, 0);
+	return rect.height;
 }
 
-ofRectangle ofxFontStash::getStringBoundingBox(const string& s, float x, float y){
-    return getBBox(s, fontSize, x, y);
+ofRectangle ofxFontStash::getStringBoundingBox(const string& s, float x, float y) {
+	return getBBox(s, fontSize, x, y);
 }
 
-void ofxFontStash::drawString(const string& s, float x, float y){
-    draw(s, fontSize, x, y);
+void ofxFontStash::drawString(const string& s, float x, float y) {
+	draw(s, fontSize, x, y);
 }
