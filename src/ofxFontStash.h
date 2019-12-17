@@ -95,7 +95,7 @@ class ofxFontStash{
                                         float highlightHeight = 20.0f,
                                         float highlightOffset = 0.0f);
 
-		void drawUnderlineForColumn(const ofRectangle& bbox, const std::string& text, float strokeWeight, float offsetY);
+		void drawUnderlineForColumn(const ofRectangle& bbox, const std::string& text, float strokeWeight, float offsetY, bool centered = false);
 
 /**
 		drawMultiColumnFormatted() how to use:

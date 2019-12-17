@@ -230,17 +230,17 @@ ofRectangle ofxFontStash::drawMultiLine(const string& _text, float size, float x
 
 
 ofRectangle ofxFontStash::drawMultiLineColumn(
-	string & _text, 
-	float size, 
-	float x, 
+	string & _text,
+	float size,
+	float x,
 	float y,
-	float maxW, 
-	int &numLines, 
-	bool dontDraw, 
+	float maxW,
+	int &numLines,
+	bool dontDraw,
 	int maxLines,
-	bool giveBackNewLinedText, 
+	bool giveBackNewLinedText,
 	bool* wordsWereTruncated,
-	bool centered, 
+	bool centered,
 	bool highlight,
 	ofColor fontColor,
 	ofColor highlightColor,
@@ -419,13 +419,21 @@ ofRectangle ofxFontStash::drawMultiLineColumn(
 
 // assumes string has already been broken up by a drawMultiColumn call with a returned bbox
 // also needs size etc. to already be set
-void ofxFontStash::drawUnderlineForColumn(const ofRectangle& bbox, const std::string& text, float strokeWeight, float offsetY)
+void ofxFontStash::drawUnderlineForColumn(const ofRectangle& bbox, const std::string& text, float strokeWeight, float offsetY, bool centered)
 {
 	std::string delim = "\n";
 	auto split = ofSplitString(text, delim, true, true);
 	for (int i = 0; i < static_cast<int>(split.size()); i++) {
 		float yy = fontSize + (lineHeight * OFX_FONT_STASH_LINE_HEIGHT_MULT * fontSize * i);
-		ofDrawRectangle(bbox.x, bbox.y + yy + offsetY, stringWidth(split[i]), strokeWeight);
+
+		float width = stringWidth(split[i]);
+	
+		if (!centered) {
+			ofDrawRectangle(bbox.x, bbox.y + yy + offsetY, width, strokeWeight);
+		} else {
+			ofDrawRectangle(bbox.x + (bbox.width / 2) - (width / 2), bbox.y + yy + offsetY, width, strokeWeight);
+		}
+
 	}
 }
 
